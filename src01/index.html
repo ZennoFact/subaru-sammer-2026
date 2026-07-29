@@ -1,0 +1,71 @@
+<!-- HTML5で書く際のDOCMENT TYPEの宣言 -->
+<!doctype html>
+<!-- Webページの基本構造 日本語のページをここで指定する -->
+<html lang="ja">
+  <!-- HEAD 情報・説明を表すセクション。ここはWebページの「メタ情報＝データを定義するデータ」を記述する -->
+  <head>
+    <!-- 文字エンコードを指定。基本的にはUTF-8を使用 -->
+    <meta charset="UTF-8" />
+    <!-- ビューポートの設定。モバイル端末での表示を最適化 -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- ページタイトル -->
+    <title>Lesson01 | Summer2026 KCG</title>
+    <!-- スタイル（デザイン的な情報）を記述する -->
+    <style>
+      img {
+        width: 600px;
+        height: auto;
+      }
+    </style>
+  </head>
+  <!--　BODY Webページとしての本体はこっち -->
+  <body>
+    <!-- h1 header1はページの主見出しを表す -->
+    <h1>KCGにようこそ！</h1>
+    <!-- p　paragraphは段落を表す -->
+    <p>プログラミングは推し活です。</p>
+    <!-- img imageは画像を表す -->
+    <img id="base-image" src="https://www.kcg.ac.jp/images/index/main_01.webp" alt="oshi" />
+    <!-- canvasは描画領域を表す -->
+    <canvas id="canvas"></canvas>
+
+    <!-- 次のレッスンの内容を書いたWebページにリンク -->
+    <a href="../src02/index.html">Lesson02へ</a>
+
+    <!-- scriptはJavaScriptを記述するためのセクション -->
+    <script>
+      // JavaScriptでHTMLの要素を取得する。今回はidという属性を使う取り方にも複数あるので，要勉強
+      const img = document.getElementById('base-image');
+
+      const canvas = document.getElementById('canvas');
+      // canvasの中の実際の描画するためのパーツ（コンテキスト）を取得する
+      const ctx = canvas.getContext('2d');
+
+      // キャンバスのサイズを設定 適当な数値まずは適当なサイズて試してからキャンバスサイズに合わせて変更
+      canvas.width = img.width;
+      canvas.height = img.height;
+
+      // 2種類の描画方法を試す
+      // 既定の形状である四角形を描画
+      ctx.fillStyle = 'blue';
+      // 指定した位置とサイズで四角形に塗りつぶす
+      ctx.fillRect(50, 380, 200, 100);
+
+      // 自由に選択した円の形状を描画
+      ctx.beginPath();
+      // 弧の設定。x座標、y座標、半径、開始角度、終了角度を指定する。角度はラジアンで指定するので，Math.PIを指定
+      ctx.arc(300, 200, 50, 0, Math.PI * 2);
+      // 塗りつぶす色の指定
+      ctx.fillStyle = 'red';
+      // 塗りつぶす処理
+      ctx.fill();
+      // 線の太さの指定
+      ctx.lineWidth = 5;
+      // 線の色の指定
+      ctx.strokeStyle = 'green';
+      // 線の描画処理
+      ctx.stroke();
+      // では，塗りつぶしと，線を描く順番を変えたらどうなると思う？討論タイムです。
+    </script>
+  </body>
+</html>
