@@ -10,6 +10,8 @@ const srcHexLabel = document.getElementById('src-hex-label');
 const dstPreview = document.getElementById('dst-preview');
 const colorChooser = document.getElementById('color-chooser');
 const dstHexLabel = document.getElementById('dst-hex-label');
+const toleranceRange = document.getElementById('tolerance-range');
+const toleranceVal = document.getElementById('tolerance-val');
 const replaceBtn = document.getElementById('replace-btn');
 const resetBtn = document.getElementById('reset-btn');
 
@@ -103,38 +105,80 @@ colorChooser.addEventListener('input', (e) => {
   dstHexLabel.textContent = `HEX: ${hex}`;
 });
 
+// replaceBtn.addEventListener('click', () => {
+//   if (!loadedImage || !targetRGB) {
+//     alert('画像と置き換え元の色（画像をクリック）を選択してください。');
+//     return;
+//   }
+
+//   // 新しい色のRGB値を取得
+//   const newColorHex = colorChooser.value;
+//   const newRGB = hexToRgb(newColorHex);
+
+//   // Canvas全体から ImageData（ピクセル配列）を取得
+//   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+//   const data = imgData.data; // ここに [R, G, B, A, R, G, B, A, ...] と並んでいる
+
+//   // 全ピクセルをループ
+//   for (let i = 0; i < data.length; i += 4) {
+//     const r = data[i]; // Red
+//     const g = data[i + 1]; // Green
+//     const b = data[i + 2]; // Blue
+//     // data[i+3] は Alpha（透明度）
+
+//     // 現在のピクセルの色(r,g,b)が、ターゲットの色(targetRGB)と一致するかチェック
+//     if (r === targetRGB.r && g === targetRGB.g && b === targetRGB.b) {
+//       // 一致したら、そのピクセルの色を新しい色(newRGB)に書き換える
+//       data[i] = newRGB.r;
+//       data[i + 1] = newRGB.g;
+//       data[i + 2] = newRGB.b;
+//       // data[i+3] (透明度) はそのまま
+//     }
+//   }
+
+//   // 変更した ImageData を Canvas に戻して描画
+//   ctx.putImageData(imgData, 0, 0);
+// });
+
+// 曖昧な色の置き換えを行う関数
 replaceBtn.addEventListener('click', () => {
   if (!loadedImage || !targetRGB) {
     alert('画像と置き換え元の色（画像をクリック）を選択してください。');
     return;
   }
 
-  // 新しい色のRGB値を取得
   const newColorHex = colorChooser.value;
   const newRGB = hexToRgb(newColorHex);
 
-  // Canvas全体から ImageData（ピクセル配列）を取得
+  // スライダーで設定したしきい値 (0〜100) を 0〜255 スケールに変換
+  const tolerance = (parseFloat(toleranceRange.value) / 100) * 255;
+
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height);
-  const data = imgData.data; // ここに [R, G, B, A, R, G, B, A, ...] と並んでいる
+  const data = imgData.data;
 
-  // 全ピクセルをループ
   for (let i = 0; i < data.length; i += 4) {
-    const r = data[i]; // Red
-    const g = data[i + 1]; // Green
-    const b = data[i + 2]; // Blue
-    // data[i+3] は Alpha（透明度）
+    const r = data[i];
+    const g = data[i + 1];
+    const b = data[i + 2];
 
-    // 現在のピクセルの色(r,g,b)が、ターゲットの色(targetRGB)と一致するかチェック
-    if (r === targetRGB.r && g === targetRGB.g && b === targetRGB.b) {
-      // 一致したら、そのピクセルの色を新しい色(newRGB)に書き換える
+    // R, G, B それぞれの差の絶対値を計算
+    const diffR = Math.abs(r - targetRGB.r);
+    const diffG = Math.abs(g - targetRGB.g);
+    const diffB = Math.abs(b - targetRGB.b);
+
+    // ユークリッド距離（色の空間上の距離）で色の近さを計算
+    // 距離の最大値は √(255^2 + 255^2 + 255^2) ≒ 441.67
+    const distance = Math.sqrt(diffR * diffR + diffG * diffG + diffB * diffB);
+
+    // 距離がしきい値以内であれば同系統の色とみなして置換
+    // (441.67 / 255 ≒ 1.732 倍にしてスケールを合わせる)
+    if (distance <= tolerance * 1.732) {
       data[i] = newRGB.r;
       data[i + 1] = newRGB.g;
       data[i + 2] = newRGB.b;
-      // data[i+3] (透明度) はそのまま
     }
   }
 
-  // 変更した ImageData を Canvas に戻して描画
   ctx.putImageData(imgData, 0, 0);
 });
 
@@ -162,7 +206,5 @@ function hexToRgb(hex) {
 // Canvasを描画する関数（元の画像データを描画）
 function drawOriginalImage() {
   if (!loadedImage) return;
-  canvas.width = loadedImage.naturalWidth;
-  canvas.height = loadedImage.naturalHeight;
-  ctx.drawImage(loadedImage, 0, 0);
+  ctx.drawImage(loadedImage, 0, 0, canvas.width, canvas.height);
 }
