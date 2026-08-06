@@ -28,7 +28,7 @@ async function initFaceLandmarker() {
   });
 
   if (img.complete && img.naturalWidth !== 0) {
-    applyPurikuraEffect();
+    applyPurikuraEffect(canvas);
   }
 }
 
@@ -51,7 +51,7 @@ img.addEventListener('load', () => {
   ctx.drawImage(img, 0, 0, width, height);
 
   if (faceLandmarker) {
-    applyPurikuraEffect();
+    applyPurikuraEffect(canvas);
   }
 });
 
@@ -60,8 +60,10 @@ img.src = imageUri;
 // =================================================================
 // ★プリクラ風加工メイン処理
 // =================================================================
-function applyPurikuraEffect() {
+function applyPurikuraEffect(canvas) {
   if (!faceLandmarker) return;
+
+  const ctx = canvas.getContext('2d');
 
   // 1. ベース画像を再描画
   const width = canvas.width;

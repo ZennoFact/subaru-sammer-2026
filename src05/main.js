@@ -23,8 +23,8 @@ async function initFaceLandmarker() {
   });
 
   if (img.complete && img.naturalWidth !== 0) {
-    // applyFaceMosaic();
-    applyFaceNegativePositive();
+    // applyFaceMosaic(canvas);
+    applyFaceNegativePositive(canvas);
   }
 }
 
@@ -46,8 +46,8 @@ img.addEventListener('load', () => {
 
   // 2. MediaPipeのロードが完了していれば顔認識・ネガポジ変換を実行
   if (faceLandmarker) {
-    // applyFaceMosaic();
-    applyFaceNegativePositive();
+    // applyFaceMosaic(canvas);
+    applyFaceNegativePositive(canvas);
   }
 });
 
@@ -73,8 +73,10 @@ function setGrayScale(canvas) {
   ctx.putImageData(imageData, 0, 0);
 }
 
-function applyFaceMosaic() {
+function applyFaceMosaic(canvas) {
   if (!faceLandmarker) return;
+
+  const ctx = canvas.getContext('2d');
 
   const result = faceLandmarker.detect(img);
 
@@ -157,8 +159,10 @@ img.addEventListener('drop', (e) => {
 });
 
 // 顔領域だけをネガポジ変換する処理
-function applyFaceNegativePositive() {
+function applyFaceNegativePositive(canvas) {
   if (!faceLandmarker) return;
+
+  const ctx = canvas.getContext('2d');
 
   const result = faceLandmarker.detect(img);
 

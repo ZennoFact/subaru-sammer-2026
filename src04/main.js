@@ -25,7 +25,7 @@ async function initFaceLandmarker() {
   });
 
   if (img.complete && img.naturalWidth !== 0) {
-    applyFaceMosaic();
+    applyFaceMosaic(canvas);
   }
 }
 
@@ -46,10 +46,8 @@ img.addEventListener('load', () => {
   // 1. まず全体をグレースケール化
   setGrayScale(canvas);
 
-  // 2. MediaPipeのロードが完了していれば顔認識・モザイクを実行
-  if (faceLandmarker) {
-    applyFaceMosaic();
-  }
+  // 2. MediaPipeの顔認識・モザイクを実行
+  applyFaceMosaic(canvas);
 });
 
 img.src = imageUri;
@@ -76,9 +74,11 @@ function setGrayScale(canvas) {
 }
 
 // 顔認識を行ってモザイクをかける処理
-function applyFaceMosaic() {
+function applyFaceMosaic(canvas) {
   // MediaPipe FaceLandmarker が初期化されていない場合は処理を中断
   if (!faceLandmarker) return;
+
+  const ctx = canvas.getContext('2d');
 
   // canvasの内容を一旦ImageDataとして取得し、MediaPipeに渡すためのImageBitmapを作成
   const result = faceLandmarker.detect(img);
